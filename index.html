@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMA</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #c4d5c4;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('https://i.postimg.cc/RFP374nq/ma.jpg');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        opacity: 0.15;
+        z-index: -1;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+        color: #0f172a;
+      }
+
+      input {
+        width: 100%;
+        max-width: 300px;
+        padding: 12px;
+        border: 2px solid black;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        background: #5e9b8a;
+        text-align: center;
+        margin: 8px 0;
+      }
+
+      input:focus {
+        border-color: #0f172a;
+        box-shadow: 0 0 5px rgba(94, 155, 138, 0.5);
+      }
+
+      input::placeholder {
+        color: #0f172a;
+        font-size: 16px;
+        font-style: italic;
+        letter-spacing: 1px;
+      }
+
+      button {
+        width: 150px;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: black;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background: #5e9b8a;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      #message {
+        font-weight: bold;
+        margin-top: 15px;
+        font-size: 14px;
+        min-height: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <input id="username" type="text" placeholder="Username" autocomplete="username">
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+      <button onclick="login()">LOGIN</button>
+      <p id="message"></p>
+    </div>
+
+    <script>
+      function login() {
+        const correctUsername = "Rhythm";
+        const correctPassword = "1926";
+
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const messageElement = document.getElementById("message");
+
+        if (username === correctUsername && password === correctPassword) {
+          messageElement.textContent = "Login successful!";
+          messageElement.style.color = "sagegreen";
+
+          setTimeout(() => {
+            window.location.href = "tracker.html";
+          }, 1000);
+        } else {
+          messageElement.textContent = "Invalid username or password.";
+          messageElement.style.color = "red";
+        }
+      }
+
+      // Allow Enter key to trigger login
+      document.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
+    </script>
+  </body>
+</html>

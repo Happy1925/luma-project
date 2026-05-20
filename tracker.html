@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>luma</title>
+        <meta name="viewport"
+         content="width=device-width,
+          initial-scale=1.0">
+          <style>
+            :root {
+                color-scheme: dark;
+                font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+                --surface: #121212;
+                --surface-variant: #1f1f1f;
+                --card: #1e293b;
+                --text-primary: #ffffff;
+                --text-secondary: #cbd5e1;
+                --accent: #3ddc84;
+                --accent-strong: #00c853;
+                --border: rgba(255,255,255,0.08);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                margin: 0;
+                min-height: 100%;
+            }
+
+            body {
+                margin: 0;
+                background: #51777c;
+                color: #000000;
+                display: flex;
+                justify-content: center;
+                padding: 18px 12px 24px;
+            }
+
+            .tracker-container {
+                width: 50vw;
+                max-width: 600px;
+                background:#51777c;
+                border:0px;
+                border-radius: 28px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+                overflow: hidden;
+            }
+
+            .app-bar {
+                padding: 18px 20px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: rgba(15,23,42,0.95);
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+            }
+
+            .app-bar h1 {
+                margin: 0;
+                font-size: 1.2rem;
+                letter-spacing: 0.04em;
+                color: var(--text-primary);
+            }
+
+            .app-bar small {
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+            }
+
+            .content {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .calendar-box {
+                background: #c4d5c4;
+                border-radius: 24px;
+                padding: 16px;
+                color: #ffffff;
+                box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+                display: grid;
+                gap: 10px;
+            }
+
+            .calendar-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 8px;
+            }
+
+            .calendar-nav button {
+                border: none;
+                background: #51777c;
+                color: #ffffff;
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+                cursor: pointer;
+                font-size: 1.2rem;
+                display: grid;
+                place-items: center;
+                transition: transform 180ms ease, background 180ms ease;
+            }
+
+            .calendar-nav button:hover {
+                background: #3f6269;
+                transform: translateY(-1px);
+            }
+
+            .calendar-title {
+                flex: 1;
+                text-align: center;
+                font-size: 2.5rem;
+                font-weight: 800;
+                letter-spacing: 0.02em;
+                margin: 0;
+                font-family: 'Georgia', 'Times New Roman', serif;
+                font-style: italic;
+                color: #000000;
+            }
+
+            table.calendar {
+                width: 100%;
+                border-collapse: collapse;
+                text-align: center;
+                margin-top: 0;
+            }
+
+            table.calendar thead {
+                border-bottom: 1px solid rgba(255,255,255,0.24);
+            }
+
+            table.calendar th,
+            table.calendar td {
+                padding: 14px 6px;
+                font-size: 1rem;
+                color: #000000;
+            }
+
+            table.calendar th {
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                opacity: 0.9;
+            }
+
+            table.calendar td {
+                min-height: 60px;
+                border-radius: 14px;
+                transition: background 180ms ease;
+            }
+
+            table.calendar td:hover {
+                background: rgba(255,255,255,0.14);
+            }
+
+            table.calendar td.empty {
+                color: rgba(255,255,255,0.55);
+            }
+
+            table.calendar td.today {
+                background: rgba(255,255,255,0.24);
+                color: #ffffff;
+                font-weight: 700;
+            }
+
+            @media (max-width: 360px) {
+                .tracker-container {
+                    width: 90vw;
+                }
+
+                .calendar-nav {
+                    gap: 8px;
+                }
+
+                .calendar-title {
+                    font-size: 2rem;
+                }
+            }
+
+            @media (max-width: 360px) {
+                .tracker-container {
+                    width: 100%;
+                }
+
+                .calendar-nav {
+                    grid-template-columns: 1fr 1fr;
+                }
+
+                .calendar-title {
+                    grid-column: 1 / -1;
+                    font-size: 0.92rem;
+                }
+            }
+          </style>
+    </head>
+    <body>
+        <div class="tracker-container">
+            <div class="content">
+                <div class="calendar-box">
+                    <div class="calendar-nav">
+                        <button type="button" onclick="changeMonth(-1)">←</button>
+                        <div class="calendar-title" id="monthYear"></div>
+                        <button type="button" onclick="changeMonth(1)">→</button>
+                    </div>
+                    <table class="calendar">
+                        <thead>
+                            <tr>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendarBody"></tbody>
+                    </table>
+                </div>
+                <div class="decision-box" style="background: #c4d5c4; border-radius: 24px; padding: 20px; color: #000000; box-shadow: 0 18px 45px rgba(0,0,0,0); min-height: 250px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Add period start date</label>
+                            <input id="newPeriodDate" type="date" style="width: 100%; padding: 8px; border: none; border-radius: 10px; font-size: 0.95rem; background: rgba(255,255,255,0.22); color: #000000;">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Prediction range</p>
+                            <p style="margin: 0; font-size: 1.2rem; font-weight: 700;" id="predictionRange">--</p>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Saved dates</p>
+                            <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;" id="savedDates">--</p>
+                            <button id="resetData" type="button" style="margin-top: 12px; padding: 10px 14px; border: none; border-radius: 12px; background: #000000; color: #ffffff; cursor: pointer; font-size: 0.95rem;">Reset</button>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; padding-left: 12px; border-left: 1px solid rgba(0,0,0,0.12);">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button aria-label="Period" style="width: 26px; height: 26px; border: none; border-radius: 8px; background: #ffc0cb; cursor: default;"></button>
+                            <button aria-label="Ovulation" style="width: 26px; height: 26px; border: none; border-radius: 8px; background: #20c997; cursor: default;"></button>
+                        </div>
+                        <div>
+                            <p style="margin: 0 0 8px 0; font-size: 0.8rem; opacity: 0.85;">Days to next period</p>
+                            <p style="margin: 0; font-size: 1.6rem; font-weight: 700;" id="daysToNext">--</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Average cycle length</p>
+                            <p style="margin: 0; font-size: 1.8rem; font-weight: 700;" id="cycleLen">-- days</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const calendarBody = document.getElementById('calendarBody');
+            const monthYear = document.getElementById('monthYear');
+            let today = new Date();
+            let currentMonth = 0; // January
+            let currentYear = 2026;
+
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            const storageKey = 'periodStartDates';
+            let predictedStart = null;
+            let predictedEnd = null;
+
+            function formatDate(date) {
+                const d = new Date(date);
+                if (Number.isNaN(d.getTime())) return '';
+                return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+
+            function formatShortDate(date) {
+                const d = new Date(date);
+                if (Number.isNaN(d.getTime())) return '';
+                return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+            }
+
+            function formatPredictionRange(start, end) {
+                const s = new Date(start);
+                const e = new Date(end);
+                if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return '';
+                const sameMonth = s.getMonth() === e.getMonth() && s.getFullYear() === e.getFullYear();
+                if (sameMonth) {
+                    return `${s.getDate()}-${e.getDate()} ${s.toLocaleDateString('en-GB', { month: 'short' })} ${s.getFullYear()}`;
+                }
+                const sameYear = s.getFullYear() === e.getFullYear();
+                if (sameYear) {
+                    return `${s.getDate()} ${s.toLocaleDateString('en-GB', { month: 'short' })} - ${e.getDate()} ${e.toLocaleDateString('en-GB', { month: 'short' })} ${s.getFullYear()}`;
+                }
+                return `${formatDate(start)} — ${formatDate(end)}`;
+            }
+
+            function addDays(date, days) {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+
+            function dateIsSameDay(a, b) {
+                return a.getFullYear() === b.getFullYear() &&
+                    a.getMonth() === b.getMonth() &&
+                    a.getDate() === b.getDate();
+            }
+
+            function getPeriodWindows(dateObjects) {
+                return dateObjects.map(start => ({
+                    start,
+                    end: addDays(start, 3)
+                }));
+            }
+
+            function getOvulationDates(dateObjects) {
+                const ovulations = [];
+                for (let i = 0; i < dateObjects.length - 1; i += 1) {
+                    const start = dateObjects[i];
+                    const next = dateObjects[i + 1];
+                    const diff = Math.round((next - start) / (1000 * 60 * 60 * 24));
+                    if (diff >= 18 && diff <= 45) {
+                        ovulations.push(addDays(start, Math.round(diff / 2)));
+                    }
+                }
+                return ovulations;
+            }
+
+            function getPeriodStartDates(dateObjects) {
+                return dateObjects.map(date => new Date(date));
+            }
+
+            function loadSavedDates() {
+                try {
+                    const raw = localStorage.getItem(storageKey);
+                    const stored = raw ? JSON.parse(raw) : [];
+                    if (!Array.isArray(stored)) return [];
+                    const validDates = stored
+                        .map(dateString => ({
+                            original: dateString,
+                            time: new Date(dateString).getTime()
+                        }))
+                        .filter(item => !Number.isNaN(item.time))
+                        .sort((a, b) => a.time - b.time)
+                        .map(item => item.original);
+                    return validDates;
+                } catch {
+                    return [];
+                }
+            }
+
+            function saveDates(dates) {
+                localStorage.setItem(storageKey, JSON.stringify(dates));
+            }
+
+            function clearSavedDates() {
+                localStorage.removeItem(storageKey);
+                predictedStart = null;
+                predictedEnd = null;
+                const emptyDates = [];
+                updateSavedDatesDisplay(emptyDates);
+                updatePredictionDisplay(emptyDates);
+                buildCalendar(currentMonth, currentYear);
+            }
+
+            function getSortedDateObjects(dates) {
+                return dates
+                    .map(dateString => new Date(dateString))
+                    .filter(date => !Number.isNaN(date.getTime()))
+                    .sort((a, b) => a - b);
+            }
+
+            function updateSavedDatesDisplay(dates) {
+                const savedEl = document.getElementById('savedDates');
+                if (!dates.length) {
+                    savedEl.textContent = '--';
+                    return;
+                }
+                savedEl.textContent = dates
+                    .slice(-5)
+                    .map(date => formatDate(date))
+                    .join(' · ');
+            }
+
+            function calculatePrediction(dates) {
+                const sorted = getSortedDateObjects(dates);
+                if (sorted.length < 2) {
+                    predictedStart = null;
+                    predictedEnd = null;
+                    return null;
+                }
+
+                const recent = sorted.slice(-5);
+                const cycleLengths = [];
+                for (let i = 1; i < recent.length; i += 1) {
+                    const diff = Math.round((recent[i] - recent[i - 1]) / (1000 * 60 * 60 * 24));
+                    cycleLengths.push(diff);
+                }
+                if (!cycleLengths.length) {
+                    predictedStart = null;
+                    predictedEnd = null;
+                    return null;
+                }
+
+                const validCycles = cycleLengths.filter(length => length >= 18 && length <= 45);
+                if (!validCycles.length) {
+                    predictedStart = null;
+                    predictedEnd = null;
+                    return null;
+                }
+
+                const shortest = Math.min(...validCycles);
+                const longest = Math.max(...validCycles);
+                const average = Math.round(validCycles.reduce((sum, value) => sum + value, 0) / validCycles.length);
+                const latestDate = recent[recent.length - 1];
+                const rawStart = addDays(latestDate, shortest);
+                const rawEnd = addDays(latestDate, longest);
+
+                const rangeSpan = Math.round((rawEnd - rawStart) / (1000 * 60 * 60 * 24));
+                if (rangeSpan > 31) {
+                    predictedStart = addDays(latestDate, Math.max(18, average - 2));
+                    predictedEnd = addDays(latestDate, Math.min(45, average + 2));
+                } else {
+                    predictedStart = rawStart;
+                    predictedEnd = rawEnd;
+                }
+
+                return { shortest, longest, average, earliest: predictedStart, latest: predictedEnd };
+            }
+
+            function updatePredictionDisplay(dates) {
+                const prediction = calculatePrediction(dates);
+                const rangeEl = document.getElementById('predictionRange');
+                const daysToNextEl = document.getElementById('daysToNext');
+                const cycleLenEl = document.getElementById('cycleLen');
+
+                if (!prediction) {
+                    rangeEl.textContent = '--';
+                    daysToNextEl.textContent = '--';
+                    cycleLenEl.textContent = '-- days';
+                    return;
+                }
+
+                const today = new Date();
+                const daysUntil = Math.max(0, Math.ceil((prediction.earliest - today) / (1000 * 60 * 60 * 24)));
+                rangeEl.textContent = formatPredictionRange(prediction.earliest, prediction.latest);
+                daysToNextEl.textContent = `${daysUntil}`;
+                cycleLenEl.textContent = `${prediction.average} days`;
+            }
+
+            function addPeriodDate(dateString) {
+                if (!dateString) return;
+                const savedDates = loadSavedDates();
+                if (!savedDates.includes(dateString)) {
+                    savedDates.push(dateString);
+                    savedDates.sort((a, b) => new Date(a) - new Date(b));
+                    saveDates(savedDates);
+                }
+                updateSavedDatesDisplay(savedDates);
+                updatePredictionDisplay(savedDates);
+                buildCalendar(currentMonth, currentYear);
+            }
+
+            function initializePeriodData() {
+                const savedDates = loadSavedDates();
+                updateSavedDatesDisplay(savedDates);
+                updatePredictionDisplay(savedDates);
+            }
+
+            function buildCalendar(month, year) {
+                calendarBody.innerHTML = '';
+                monthYear.textContent = `${monthNames[month]} ${year}`;
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const savedDates = loadSavedDates();
+                const savedDateObjects = getSortedDateObjects(savedDates);
+                const periodWindows = getPeriodWindows(savedDateObjects);
+                const ovulationDates = getOvulationDates(savedDateObjects);
+                const periodStartDates = getPeriodStartDates(savedDateObjects);
+                let date = 1;
+                for (let row = 0; row < 6; row++) {
+                    const rowElement = document.createElement('tr');
+
+                    for (let col = 0; col < 7; col++) {
+                        const cell = document.createElement('td');
+
+                        if (row === 0 && col < firstDay) {
+                            cell.textContent = '';
+                            cell.classList.add('empty');
+                        } else if (date > daysInMonth) {
+                            cell.textContent = '';
+                            cell.classList.add('empty');
+                        } else {
+                            cell.textContent = date;
+                            const cellDate = new Date(year, month, date);
+                            let marked = false;
+
+                            for (const start of periodStartDates) {
+                                if (dateIsSameDay(cellDate, start)) {
+                                    cell.style.background = 'rgba(255, 111, 128, 0.65)';
+                                    cell.style.color = '#000000';
+                                    cell.style.fontWeight = '700';
+                                    cell.style.border = '2px solid rgba(255, 111, 128, 1)';
+                                    marked = true;
+                                    break;
+                                }
+                            }
+
+                            if (!marked) {
+                                for (const window of periodWindows) {
+                                    if (cellDate >= window.start && cellDate <= window.end) {
+                                        cell.style.background = 'rgba(255, 111, 128, 0.45)';
+                                        cell.style.color = '#000000';
+                                        cell.style.fontWeight = '700';
+                                        marked = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!marked) {
+                                for (const ovulation of ovulationDates) {
+                                    if (dateIsSameDay(cellDate, ovulation)) {
+                                        cell.style.background = 'rgba(32, 201, 151, 0.45)';
+                                        cell.style.color = '#000000';
+                                        cell.style.fontWeight = '700';
+                                        marked = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!marked && predictedStart && predictedEnd && cellDate >= predictedStart && cellDate <= predictedEnd) {
+                                cell.style.background = 'rgba(255, 193, 7, 0.25)';
+                                cell.style.color = '#000000';
+                                cell.style.fontWeight = '700';
+                            }
+
+                            if (
+                                date === today.getDate() &&
+                                month === today.getMonth() &&
+                                year === today.getFullYear()
+                            ) {
+                                cell.classList.add('today');
+                            }
+                            date++;
+                        }
+                        rowElement.appendChild(cell);
+                    }
+                    calendarBody.appendChild(rowElement);
+                    if (date > daysInMonth) {
+                        break;
+                    }
+                }
+            }
+
+            function changeMonth(offset) {
+                currentMonth += offset;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear -= 1;
+                } else if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear += 1;
+                }
+                buildCalendar(currentMonth, currentYear);
+            }
+
+            buildCalendar(currentMonth, currentYear);
+            initializePeriodData();
+
+            const newPeriodInput = document.getElementById('newPeriodDate');
+            newPeriodInput.addEventListener('change', () => {
+                addPeriodDate(newPeriodInput.value);
+                newPeriodInput.value = '';
+            });
+
+            const resetButton = document.getElementById('resetData');
+            resetButton.addEventListener('click', clearSavedDates);
+
+        </script>
+    </body>
+</html>

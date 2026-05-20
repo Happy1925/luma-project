@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <meta name ="viewpoint"
+        content="width=device-width, initial-scale=1.0">
+
+        <title>entries</title>
+      <style>
+        :root{
+          --card-bg: #ffffff;
+          --accent: #6200ee;
+          --surface: #f5f5f5;
+          --tile-period: #ffc0cb;
+          --tile-ovulation: #20c997;
+        }
+        html,body{height:100%;}
+        body { 
+          background: #c4d5c4;
+          height:100vh;
+          margin: 0;
+          display:flex;
+          justify-content:center;
+          align-items:flex-start;
+          font-family: 'Roboto', 'Noto Sans', sans-serif;
+          -webkit-font-smoothing:antialiased;
+        }
+        body:before {
+            content:"";
+            position:absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:url('https://i.postimg.cc/KjBV0Bc2/be.jpg');
+            background-repeat:no-repeat;
+            background-position: center;
+            background-size: cover;
+            opacity: 0.06;
+            z-index: -1;
+        }
+
+        .entries-app{
+          width:100%;
+          max-width:420px;
+          margin:32px 16px;
+        }
+
+        .entries-card{
+          background: var(--card-bg);
+          border-radius:18px;
+          padding:16px;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        }
+
+        .entries-header{
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-style: italic;
+          font-weight:700;
+          font-size:20px;
+          letter-spacing:0.08em;
+          margin:6px 0 14px 0;
+          color:#111;
+          transform: skewX(-6deg);
+        }
+
+        .entries-list{
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+          margin-bottom:12px;
+        }
+
+        .dates-row{
+          display:flex;
+          gap:8px;
+          overflow:auto;
+          padding:6px 2px;
+        }
+        .date-pill{
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          min-width:60px;
+          user-select:none;
+        }
+        .date-circle{
+          width:38px;
+          height:38px;
+          border-radius:8px;
+          background:#51777c;
+          color:#fff;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-weight:700;
+        }
+
+        /* calendar styles */
+        .month-card{
+          margin-top:16px;
+          background: #fff;
+          border-radius:12px;
+          padding:10px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .month-nav{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          margin-bottom:8px;
+        }
+
+        .month-title{ font-weight:700; color:#111 }
+
+        table.calendar{ width:100%; border-collapse:collapse; }
+        table.calendar th, table.calendar td { padding:8px; text-align:center; }
+        table.calendar th{ font-size:11px; color:#333 }
+        table.calendar td{ width:40px; height:40px; border-radius:8px; }
+        table.calendar td .day-cell{ display:inline-block; width:36px; height:36px; line-height:36px; border-radius:8px; background:#51777c; color:#fff; font-weight:600; }
+        table.calendar td.empty{ color: rgba(0,0,0,0.2); }
+
+        .day-tile{
+          width:64px;
+          height:72px;
+          border-radius:12px;
+          background: #fff;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+          cursor: pointer;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .day-num{
+          font-size:18px;
+          font-weight:700;
+          margin-bottom:4px;
+        }
+        .day-week{
+          font-size:11px;
+          text-transform:uppercase;
+          color: #555;
+        }
+
+        /* small colored swatches for period/ovulation shown inside tiles */
+        .day-tile.period{ background: linear-gradient(180deg, var(--tile-period), #fff); }
+        .day-tile.ovulation{ background: linear-gradient(180deg, var(--tile-ovulation), #fff); }
+
+        .saved-entries-section{
+          margin-top:16px;
+          background: #fff;
+          border-radius:12px;
+          padding:16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .saved-entries-container{
+          display:flex;
+          flex-direction:column;
+          gap:0;
+        }
+
+        @media (max-width:420px){
+          .day-tile{ width:58px; height:66px; }
+          .entries-app{ margin-top:18px }
+        }
+      </style>
+    </head>
+    <body>
+        <div class="entries-app">
+          <div class="entries-card">
+            <div class="entries-header">ENTRIES</div>
+
+            <div class="entries-list" id="entriesList">
+              <!-- example day tiles; in app these will be populated -->
+            </div>
+
+            <div class="month-card">
+              <div class="month-nav">
+                <button id="prevMonth" style="border:none;background:transparent;font-size:18px;cursor:pointer">◀</button>
+                <div class="month-title" id="monthYearLabel">January 2026</div>
+                <button id="nextMonth" style="border:none;background:transparent;font-size:18px;cursor:pointer">▶</button>
+              </div>
+
+              <div class="dates-row" id="datesRow">
+                <!-- horizontal date pills will be generated here -->
+              </div>
+            </div>
+
+            <div class="saved-entries-section">
+              <div style="font-weight:700; color:#111; margin-top:16px; margin-bottom:8px; font-size:14px;">Saved Entries</div>
+              <div class="saved-entries-container" id="savedEntriesContainer">
+                <!-- saved entries load here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </body>
+    <script>
+      const entriesList = document.getElementById('entriesList');
+      const datesRow = document.getElementById('datesRow');
+      const savedEntriesContainer = document.getElementById('savedEntriesContainer');
+      const monthYearLabel = document.getElementById('monthYearLabel');
+      const prevMonthBtn = document.getElementById('prevMonth');
+      const nextMonthBtn = document.getElementById('nextMonth');
+
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      let currentMonth = 0; // January
+      let currentYear = 2026;
+
+      const nudeColors = ['#FBE9EC','#F6E7E1','#F3D9D2','#EEF7F2','#E8F4EA','#FFF1F3','#F9EFEA','#F5EAEA'];
+      let colorIdx = 0;
+      const storageKey = 'periodEntries'; // format: { "YYYY-MM-DD": "note text" }
+
+      function loadSavedEntries() {
+        const stored = localStorage.getItem(storageKey);
+        return stored ? JSON.parse(stored) : {};
+      }
+
+      function saveNote(dateStr, note) {
+        const entries = loadSavedEntries();
+        if (note.trim()) {
+          entries[dateStr] = note;
+        } else {
+          delete entries[dateStr];
+        }
+        localStorage.setItem(storageKey, JSON.stringify(entries));
+        displaySavedEntries();
+      }
+
+      function displaySavedEntries() {
+        const entries = loadSavedEntries();
+        savedEntriesContainer.innerHTML = '';
+        const sorted = Object.entries(entries).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+        sorted.forEach(([dateStr, note]) => {
+          const dateObj = new Date(dateStr + 'T00:00:00');
+          const displayDate = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', weekday: 'short' });
+          const box = document.createElement('div');
+          box.style.display = 'flex';
+          box.style.alignItems = 'center';
+          box.style.gap = '8px';
+          box.style.padding = '10px';
+          box.style.borderRadius = '12px';
+          box.style.marginBottom = '10px';
+          box.style.background = nudeColors[Math.floor(Math.random() * nudeColors.length)];
+          const lbl = document.createElement('div');
+          lbl.textContent = displayDate;
+          lbl.style.fontWeight = '700';
+          lbl.style.minWidth = '110px';
+          const noteDiv = document.createElement('div');
+          noteDiv.textContent = note;
+          noteDiv.style.flex = '1';
+          noteDiv.style.padding = '8px';
+          box.appendChild(lbl);
+          box.appendChild(noteDiv);
+          savedEntriesContainer.appendChild(box);
+        });
+      }
+
+      function buildDatesRow(month, year){
+        datesRow.innerHTML = '';
+        monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+        const daysInMonth = new Date(year, month+1, 0).getDate();
+        for(let d=1; d<=daysInMonth; d++){
+          const pill = document.createElement('div');
+          pill.className = 'date-pill';
+          pill.style.minWidth = '64px';
+          pill.style.display = 'flex';
+          pill.style.flexDirection = 'column';
+          pill.style.alignItems = 'center';
+          pill.style.justifyContent = 'center';
+          pill.style.cursor = 'pointer';
+          pill.style.padding = '6px';
+
+          const circle = document.createElement('div');
+          circle.className = 'date-circle';
+          circle.style.width = '38px';
+          circle.style.height = '38px';
+          circle.style.borderRadius = '8px';
+          circle.style.background = '#51777c';
+          circle.style.color = '#fff';
+          circle.style.display = 'flex';
+          circle.style.alignItems = 'center';
+          circle.style.justifyContent = 'center';
+          circle.style.fontWeight = '700';
+          circle.textContent = d;
+
+          const dateObj = new Date(year, month, d);
+          const wk = document.createElement('div');
+          wk.textContent = dateObj.toLocaleDateString('en-GB',{weekday:'short'});
+          wk.style.fontSize = '11px'; wk.style.color = '#333'; wk.style.marginTop = '6px';
+
+          pill.appendChild(circle);
+          pill.appendChild(wk);
+          pill.addEventListener('click', ()=> addEntry(dateObj));
+          datesRow.appendChild(pill);
+        }
+      }
+
+      function addEntry(dateObj){
+        const dateStr = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+        const box = document.createElement('div');
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.gap = '8px';
+        box.style.padding = '10px';
+        box.style.borderRadius = '12px';
+        box.style.marginBottom = '10px';
+        box.style.background = nudeColors[colorIdx % nudeColors.length];
+        colorIdx++;
+
+        const lbl = document.createElement('div');
+        lbl.textContent = dateObj.toLocaleDateString('en-GB',{day:'2-digit', month:'short', weekday:'short'});
+        lbl.style.fontWeight = '700';
+        lbl.style.minWidth = '110px';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Add note...';
+        input.style.flex = '1';
+        input.style.padding = '8px';
+        input.style.border = 'none';
+        input.style.borderRadius = '8px';
+        input.style.background = 'rgba(255,255,255,0.6)';
+
+        input.addEventListener('blur', () => {
+          saveNote(dateStr, input.value);
+          if (!input.value.trim()) {
+            box.remove();
+          }
+        });
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            saveNote(dateStr, input.value);
+            input.blur();
+          }
+        });
+
+        box.appendChild(lbl);
+        box.appendChild(input);
+        entriesList.appendChild(box);
+        input.focus();
+      }
+
+      prevMonthBtn.addEventListener('click', ()=>{ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } buildDatesRow(currentMonth,currentYear); });
+      nextMonthBtn.addEventListener('click', ()=>{ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } buildDatesRow(currentMonth,currentYear); });
+
+      // initialize to January 2026
+      buildDatesRow(currentMonth,currentYear);
+      displaySavedEntries();
+    </script>
+</html>
