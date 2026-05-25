@@ -169,6 +169,23 @@
                 font-weight: 700;
             }
 
+            .entry-link-button {
+                display: inline-block;
+                padding: 10px 16px;
+                border-radius: 14px;
+                background: #000000;
+                color: #ffffff;
+                text-decoration: none;
+                font-size: 0.95rem;
+                font-weight: 600;
+                transition: background 180ms ease, transform 180ms ease;
+            }
+
+            .entry-link-button:hover {
+                background: #202020;
+                transform: translateY(-1px);
+            }
+
             @media (max-width: 360px) {
                 .tracker-container {
                     width: 90vw;
@@ -251,8 +268,9 @@
                         <div>
                             <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Average cycle length</p>
                             <p style="margin: 0; font-size: 1.8rem; font-weight: 700;" id="cycleLen">-- days</p>
-                        </div>
-                    </div>
+                        </div>                        <div>
+                            <a href="entry.html" class="entry-link-button">Entry</a>
+                        </div>                    </div>
                 </div>
             </div>
         </div>
