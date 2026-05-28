@@ -82,7 +82,7 @@
                 color: #ffffff;
                 box-shadow: 0 18px 45px rgba(0,0,0,0.18);
                 display: grid;
-                gap: 8px;
+                gap: 7px;
             }
 
             .calendar-nav {
@@ -240,27 +240,33 @@
                         <tbody id="calendarBody"></tbody>
                     </table>
                 </div>
-                <div class="decision-box" style="background: #c4d5c4; border-radius: 24px; padding: 20px; color: #000000; box-shadow: 0 18px 45px rgba(0,0,0,0); min-height: 250px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
-                    <div style="flex: 1;">
-                        <div style="margin-bottom: 16px;">
-                            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Add period start date</label>
-                            <input id="newPeriodDate" type="date" style="width: 100%; padding: 8px; border: none; border-radius: 10px; font-size: 0.95rem; background: rgba(255,255,255,0.22); color: #000000;">
+                <div class="decision-box" style="background: #c4d5c4; border-radius: 24px; padding: 20px; color: #000000; box-shadow: 0 18px 45px rgba(0,0,0,0); min-height: 250px; display: flex; justify-content: space-between; align-items: stretch; gap: 20px;">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Add period start date</label>
+                                <input id="newPeriodDate" type="date" style="width: 100%; padding: 8px; border: none; border-radius: 10px; font-size: 0.95rem; background: rgba(255,255,255,0.22); color: #000000;">
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Prediction range</p>
+                                <p style="margin: 0; font-size: 1.2rem; font-weight: 700;" id="predictionRange">--</p>
+                            </div>
                         </div>
-                        <div style="margin-bottom: 16px;">
-                            <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Prediction range</p>
-                            <p style="margin: 0; font-size: 1.2rem; font-weight: 700;" id="predictionRange">--</p>
-                        </div>
-                        <div style="margin-bottom: 16px;">
-                            <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Saved dates</p>
-                            <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;" id="savedDates">--</p>
-                            <button id="resetData" type="button" style="margin-top: 12px; padding: 10px 14px; border: none; border-radius: 12px; background: #000000; color: #ffffff; cursor: pointer; font-size: 0.95rem;">Reset</button>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+                            <button id="resetData" type="button" style="width: fit-content; padding: 10px 14px; border: none; border-radius: 12px; background: #000000; color: #ffffff; cursor: pointer; font-size: 0.95rem;">Reset</button>
+                            <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.12);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="display:inline-block;width:18px;height:18px;border-radius:6px;background:#ffc0cb;"></span>
+                                    <span style="font-size:0.95rem;font-weight:600;">Period</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="display:inline-block;width:18px;height:18px;border-radius:6px;background:#20c997;"></span>
+                                    <span style="font-size:0.95rem;font-weight:600;">Ovulation</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; padding-left: 12px; border-left: 1px solid rgba(0,0,0,0.12);">
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <button aria-label="Period" style="width: 26px; height: 26px; border: none; border-radius: 8px; background: #ffc0cb; cursor: default;"></button>
-                            <button aria-label="Ovulation" style="width: 26px; height: 26px; border: none; border-radius: 8px; background: #20c997; cursor: default;"></button>
-                        </div>
                         <div>
                             <p style="margin: 0 0 8px 0; font-size: 0.8rem; opacity: 0.85;">Days to next period</p>
                             <p style="margin: 0; font-size: 1.6rem; font-weight: 700;" id="daysToNext">--</p>
@@ -268,9 +274,11 @@
                         <div>
                             <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.85;">Average cycle length</p>
                             <p style="margin: 0; font-size: 1.8rem; font-weight: 700;" id="cycleLen">-- days</p>
-                        </div>                        <div>
+                        </div>
+                        <div>
                             <a href="entry.html" class="entry-link-button">Entry</a>
-                        </div>                    </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -381,9 +389,7 @@
                 localStorage.removeItem(storageKey);
                 predictedStart = null;
                 predictedEnd = null;
-                const emptyDates = [];
-                updateSavedDatesDisplay(emptyDates);
-                updatePredictionDisplay(emptyDates);
+                updatePredictionDisplay([]);
                 buildCalendar(currentMonth, currentYear);
             }
 
@@ -480,14 +486,12 @@
                     savedDates.sort((a, b) => new Date(a) - new Date(b));
                     saveDates(savedDates);
                 }
-                updateSavedDatesDisplay(savedDates);
                 updatePredictionDisplay(savedDates);
                 buildCalendar(currentMonth, currentYear);
             }
 
             function initializePeriodData() {
                 const savedDates = loadSavedDates();
-                updateSavedDatesDisplay(savedDates);
                 updatePredictionDisplay(savedDates);
             }
 
@@ -595,10 +599,12 @@
             initializePeriodData();
 
             const newPeriodInput = document.getElementById('newPeriodDate');
-            newPeriodInput.addEventListener('change', () => {
-                addPeriodDate(newPeriodInput.value);
-                newPeriodInput.value = '';
-            });
+            if (newPeriodInput) {
+                newPeriodInput.addEventListener('change', () => {
+                    addPeriodDate(newPeriodInput.value);
+                    newPeriodInput.value = '';
+                });
+            }
 
             const resetButton = document.getElementById('resetData');
             resetButton.addEventListener('click', clearSavedDates);

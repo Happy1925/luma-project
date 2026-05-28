@@ -41,14 +41,14 @@
 
         .entries-app{
           width:100%;
-          max-width:420px;
+          max-width:520px;
           margin:32px 16px;
         }
 
         .entries-card{
           background: var(--card-bg);
           border-radius:18px;
-          padding:16px;
+          padding:20px;
           box-shadow: 0 6px 18px rgba(0,0,0,0.12);
         }
 
@@ -197,6 +197,14 @@
               <div class="saved-entries-container" id="savedEntriesContainer">
                 <!-- saved entries load here -->
               </div>
+              <div class="saved-dates-section" style="margin-top:18px;">
+                <div style="font-weight:700; color:#111; margin-bottom:8px; font-size:14px;">Saved period dates</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <input id="periodDateInput" type="date" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; background:#f8f8f8; font-size:0.95rem;" />
+                  <button id="periodDateSave" type="button" style="padding:12px; border:none; border-radius:14px; background:#51777c; color:#fff; font-weight:700; cursor:pointer;">Save date</button>
+                </div>
+                <div id="savedPeriodsList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; color:#111; font-size:0.95rem;"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -233,6 +241,73 @@
         localStorage.setItem(storageKey, JSON.stringify(entries));
         displaySavedEntries();
       }
+
+      const periodDateInput = document.getElementById('periodDateInput');
+      const periodDateSave = document.getElementById('periodDateSave');
+      const savedPeriodsList = document.getElementById('savedPeriodsList');
+      const periodStorageKey = 'periodStartDates';
+
+      function loadSavedPeriodDates() {
+        const raw = localStorage.getItem(periodStorageKey);
+        if (!raw) return [];
+        try {
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed
+            .map(dateString => new Date(dateString))
+            .filter(date => !Number.isNaN(date.getTime()))
+            .sort((a, b) => a - b)
+            .map(date => date.toISOString().split('T')[0]);
+        } catch {
+          return [];
+        }
+      }
+
+      function savePeriodDateToStorage(dateStr) {
+        if (!dateStr) return;
+        const dates = loadSavedPeriodDates();
+        if (!dates.includes(dateStr)) {
+          dates.push(dateStr);
+          dates.sort((a, b) => new Date(a) - new Date(b));
+          localStorage.setItem(periodStorageKey, JSON.stringify(dates));
+        }
+        displaySavedPeriodDates();
+      }
+
+      function displaySavedPeriodDates() {
+        const periodDates = loadSavedPeriodDates();
+        savedPeriodsList.innerHTML = '';
+        if (!periodDates.length) {
+          const hint = document.createElement('div');
+          hint.textContent = 'No saved period dates yet.';
+          hint.style.color = '#555';
+          savedPeriodsList.appendChild(hint);
+          return;
+        }
+        periodDates.forEach(dateStr => {
+          const chip = document.createElement('div');
+          chip.textContent = new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+          chip.style.padding = '8px 10px';
+          chip.style.borderRadius = '999px';
+          chip.style.background = '#eef7f2';
+          chip.style.color = '#111';
+          chip.style.fontWeight = '600';
+          savedPeriodsList.appendChild(chip);
+        });
+      }
+
+      periodDateSave.addEventListener('click', () => {
+        if (periodDateInput.value) {
+          savePeriodDateToStorage(periodDateInput.value);
+          periodDateInput.value = '';
+        }
+      });
+
+      periodDateInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          periodDateSave.click();
+        }
+      });
 
       function displaySavedEntries() {
         const entries = loadSavedEntries();
@@ -354,5 +429,6 @@
       // initialize to January 2026
       buildDatesRow(currentMonth,currentYear);
       displaySavedEntries();
+      displaySavedPeriodDates();
     </script>
 </html>
