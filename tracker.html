@@ -287,8 +287,8 @@
             const calendarBody = document.getElementById('calendarBody');
             const monthYear = document.getElementById('monthYear');
             let today = new Date();
-            let currentMonth = 0; // January
-            let currentYear = 2026;
+            let currentMonth = today.getMonth();
+            let currentYear = today.getFullYear();
 
             const monthNames = [
                 'January', 'February', 'March', 'April', 'May', 'June',
