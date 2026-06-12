@@ -105,6 +105,11 @@
         min-height: 20px;
       }
     </style>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon.jpg" type="image/jpeg">
+    <meta name="theme-color" content="#51777c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/icons/icon.jpg">
   </head>
   <body>
     <div class="container">
@@ -154,6 +159,16 @@
           login();
         }
       });
+    </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.error('SW register failed:', err));
+        });
+      }
     </script>
   </body>
 </html>
