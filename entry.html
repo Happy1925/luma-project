@@ -147,7 +147,7 @@
           color: #555;
         }
 
-        /* small colored swatches for period/ovulation shown inside tiles */
+
         .day-tile.period{ background: linear-gradient(180deg, var(--tile-period), #fff); }
         .day-tile.ovulation{ background: linear-gradient(180deg, var(--tile-ovulation), #fff); }
 
@@ -177,7 +177,7 @@
             <div class="entries-header">ENTRIES</div>
 
             <div class="entries-list" id="entriesList">
-              <!-- example day tiles; in app these will be populated -->
+
             </div>
 
             <div class="month-card">
@@ -188,14 +188,14 @@
               </div>
 
               <div class="dates-row" id="datesRow">
-                <!-- horizontal date pills will be generated here -->
+
               </div>
             </div>
 
             <div class="saved-entries-section">
               <div style="font-weight:700; color:#111; margin-top:16px; margin-bottom:8px; font-size:14px;">Saved Entries</div>
               <div class="saved-entries-container" id="savedEntriesContainer">
-                <!-- saved entries load here -->
+          
               </div>
               <div class="saved-dates-section" style="margin-top:18px;">
                 <div style="font-weight:700; color:#111; margin-bottom:8px; font-size:14px;">Saved period dates</div>
@@ -426,7 +426,6 @@
       prevMonthBtn.addEventListener('click', ()=>{ currentMonth--; if(currentMonth<0){ currentMonth=11; currentYear--; } buildDatesRow(currentMonth,currentYear); });
       nextMonthBtn.addEventListener('click', ()=>{ currentMonth++; if(currentMonth>11){ currentMonth=0; currentYear++; } buildDatesRow(currentMonth,currentYear); });
 
-      // initialize to January 2026
       buildDatesRow(currentMonth,currentYear);
       displaySavedEntries();
       displaySavedPeriodDates();
